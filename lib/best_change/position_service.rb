@@ -30,7 +30,7 @@ class BestChange::PositionService
       comission  = row.base_rate_percent - step
     end
 
-    exchange_rate.update_columns(comission: comission)
+    Gera::ExchangeRateUpdaterWorker.perform_async(exchange_rate.id, { comission: comission })
   end
 
   private
