@@ -30,7 +30,7 @@ class BestChange::PositionService
       comission  = row.base_rate_percent - step
     end
 
-    Gera::ExchangeRateUpdaterWorker.perform_in(Random.new.rand(1..5).seconds, exchange_rate.id, { comission: comission })
+    Gera::ExchangeRateUpdaterWorker.perform_in(Random.new.rand(1..10).seconds, exchange_rate.id, { comission: comission })
   end
 
   private
