@@ -21,6 +21,10 @@ module BestChange
       @my_row ||= build[:my_row]
     end
 
+    def rows_without_kassa
+      @rows_without_kassa ||= build_without_kassa
+    end
+
     private
 
     delegate :bestchange_key, :currency_pair, to: :exchange_rate
@@ -60,6 +64,26 @@ module BestChange
       end
 
       { rows: sorted_list, my_row: my_row, status: my_row.try(:status) }
+    end
+
+    def build_without_kassa
+      source_rows.map do |row|
+        next if row.is_my?
+
+        base_rate_percent = calculate_comission(row.rate, base_rate_multiplicator).round ROUND
+        base_rate_percent = Record::NULL_STUB if base_rate_percent.is_a?(Float) && base_rate_percent.nan?
+        Record.new(
+          exchanger_id:      row.exchanger_id,
+          exchanger_name:    row.exchanger_name,
+          buy_price:         row.buy_price,
+          sell_price:        row.sell_price,
+          reserve:           row.reserve,
+          time:              row.time,
+          position:          row.position,
+          base_rate_percent: base_rate_percent,
+          target_rate_percent: base_rate_percent
+        )
+      end.compact.sort
     end
 
     def build_status(row:, target_position:)
