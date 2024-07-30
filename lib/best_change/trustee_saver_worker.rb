@@ -42,7 +42,7 @@ module BestChange
 
     def format_currency(payment_system)
       currency = payment_system.currency.to_s.downcase
-      return unless currency.inquiry.usdt?
+      return currency.upcase unless currency.inquiry.usdt?
 
       TOKEN_NETWORK_TO_CURRENCY[payment_system.token_network]
     end
