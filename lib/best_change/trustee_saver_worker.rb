@@ -48,7 +48,7 @@ module BestChange
           exchanger_id:   rate['exchangeWayId'],
           exchanger_name: rate['provider'],
           buy_price:      1,
-          sell_price:     rate['exchangeRate']['exchangeRate'],
+          sell_price:     rate.dig('exchangeRate', 'exchangeRate') || 0,
           reserve:        rate['limits']['max'],
           time:           timestamp
         )
