@@ -40,10 +40,14 @@ module BestChange
     end
 
     def collect(ps1, ps2, timestamp, data)
-      data.map do |rate|
+      filtered_data = data.map do |rate|
         next if ps1.trustee_payway_code.present? && ps1.trustee_payway_code != rate['inPaywayCode']
         next if ps2.trustee_payway_code.present? && ps2.trustee_payway_code != rate['outPaywayCode']
 
+        rate
+      end.compact
+      filtered_data.uniq! { |rate| rate['provider'] }
+      filtered_data.map do |rate|
         BestChange::Row.new(
           exchanger_id:   rate['exchangeWayId'],
           exchanger_name: rate['provider'],
@@ -52,7 +56,7 @@ module BestChange
           reserve:        rate['limits']['max'],
           time:           timestamp
         )
-      end.compact
+      end
     end
   end
 end
