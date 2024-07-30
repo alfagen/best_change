@@ -14,17 +14,20 @@ module BestChange
 
     def perform(exchange_rate_id, timestamp)
       exchange_rate = Gera::ExchangeRate.find(exchange_rate_id)
-      ps1 = exchange_rate.income_payment_system.bestchange_id
-      ps2 = exchange_rate.outcome_payment_system.bestchange_id
-      key = BestChange::Repository.generate_key_from_bestchange_ids ps1, ps2, 'trustee'
-      in_currency = format_currency(exchange_rate.income_payment_system)
-      out_currency = format_currency(exchange_rate.outcome_payment_system)
+      ps1 = exchange_rate.income_payment_system
+      ps2 = exchange_rate.outcome_payment_system
+      key = BestChange::Repository.generate_key_from_bestchange_ids ps1.bestchange_id, ps2.bestchange_id, 'trustee'
+      in_currency = format_currency(ps1)
+      out_currency = format_currency(ps2)
 
       url = "#{BASE_URL}?inCurrencyCode=#{in_currency}&outCurrencyCode=#{out_currency}"
       uri = URI(url)
       response = Net::HTTP.get(uri)
       data = JSON.parse(response)
       rates = data['sell'].map do |rate|
+        next if ps1.trustee_payway_code.present? && ps1.trustee_payway_code != rate['inPaywayCode']
+        next if ps2.trustee_payway_code.present? && ps2.trustee_payway_code != rate['outPaywayCode']
+
         BestChange::Row.new(
           exchanger_id:   rate['exchangeWayId'],
           exchanger_name: rate['provider'],
@@ -33,7 +36,7 @@ module BestChange
           reserve:        rate['limits']['max'],
           time:           timestamp
         )
-      end
+      end.compact
 
       BestChange::Repository.setRows key, rates.sort
     end
