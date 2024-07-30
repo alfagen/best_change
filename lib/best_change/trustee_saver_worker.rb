@@ -24,7 +24,23 @@ module BestChange
       uri = URI(url)
       response = Net::HTTP.get(uri)
       data = JSON.parse(response)
-      rates = data['sell'].map do |rate|
+      rates = collect(ps1, ps2, timestamp, data['sell'])
+      rates = collect(ps1, ps2, timestamp, data['exchange']) if rates.empty?
+
+      BestChange::Repository.setRows key, rates.sort
+    end
+
+    private
+
+    def format_currency(payment_system)
+      currency = payment_system.currency.to_s.downcase
+      return currency.upcase unless currency.inquiry.usdt?
+
+      TOKEN_NETWORK_TO_CURRENCY[payment_system.token_network]
+    end
+
+    def collect(ps1, ps2, timestamp, data)
+      data.map do |rate|
         next if ps1.trustee_payway_code.present? && ps1.trustee_payway_code != rate['inPaywayCode']
         next if ps2.trustee_payway_code.present? && ps2.trustee_payway_code != rate['outPaywayCode']
 
@@ -37,17 +53,6 @@ module BestChange
           time:           timestamp
         )
       end.compact
-
-      BestChange::Repository.setRows key, rates.sort
-    end
-
-    private
-
-    def format_currency(payment_system)
-      currency = payment_system.currency.to_s.downcase
-      return currency.upcase unless currency.inquiry.usdt?
-
-      TOKEN_NETWORK_TO_CURRENCY[payment_system.token_network]
     end
   end
 end
