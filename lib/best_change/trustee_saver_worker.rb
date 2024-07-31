@@ -4,7 +4,7 @@ module BestChange
   class TrusteeSaverWorker
     include ::Sidekiq::Worker
 
-    sidekiq_options queue: :critical, retry: 3
+    sidekiq_options queue: :default, retry: 3
 
     BASE_URL = 'https://api.v3.trustee.deals/data/all'
     TOKEN_NETWORK_TO_CURRENCY = {
