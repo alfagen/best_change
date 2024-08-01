@@ -76,7 +76,7 @@ module BestChange
       exchanger_id = exchanger_id.to_i
       buy_price    = buy_price.to_f
       sell_price   = sell_price.to_f
-      key          = BestChange::Repository.generate_key_from_bestchange_ids ps1, ps2
+      key          = BestChange::Repository.generate_key_from_bestchange_ids ps1, ps2, 'bestchange'
 
       d = directions[key] ||= []
       d << BestChange::Row.new(

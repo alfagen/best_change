@@ -12,7 +12,7 @@ class BestChange::Row
   attr_accessor :position
 
   def is_my?
-    exchanger_id == BestChange.configuration.exchanger_id
+    exchanger_id == BestChange.configuration.exchanger_id || exchanger_name == 'KASSA'
   end
 
   # Для сериализатора

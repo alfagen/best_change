@@ -15,6 +15,8 @@ require "best_change/status_entity"
 require "best_change/status"
 require "best_change/status_serializer"
 require "best_change/configuration"
+require "best_change/trustee_loading_worker"
+require "best_change/trustee_saver_worker"
 
 module BestChange
   class << self

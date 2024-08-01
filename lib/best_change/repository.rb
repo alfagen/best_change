@@ -13,8 +13,8 @@ module BestChange
       delegate :getRows, :setRows, :getRowByExchangerId, to: :instance
 
       # Идентификаторы платежных систем в bestchange
-      def generate_key_from_bestchange_ids(id1, id2)
-        [id1, id2].join KEY_SEPARATOR
+      def generate_key_from_bestchange_ids(id1, id2, source)
+        [source, id1, id2].join KEY_SEPARATOR
       end
     end
 
