@@ -55,7 +55,7 @@ module BestChange
         bcr
       end
 
-      sorted_list = list.sort
+      sorted_list = list.sort.reverse
 
       if my_row.present?
         my_row.status = build_status(
@@ -84,7 +84,7 @@ module BestChange
           base_rate_percent: base_rate_percent,
           target_rate_percent: base_rate_percent
         )
-      end.compact.sort
+      end.compact.sort.reverse
     end
 
     def build_status(row:, target_position:)
