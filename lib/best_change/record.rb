@@ -23,10 +23,10 @@ class BestChange::Record
   end
 
   def <=>(other)
-    t1 = self.target_rate_percent
+    t1 = self.sell_price
     t1 = NULL_STUB if t1.nil? || (t1.is_a?(Float) && t1.nan?) || t1.infinite?
 
-    t2 = other.target_rate_percent
+    t2 = other.sell_price
     t2 = NULL_STUB if t2.nil? || (t2.is_a?(Float) && t2.nan?) || t2.infinite?
 
     t1 <=> t2

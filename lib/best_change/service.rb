@@ -35,6 +35,7 @@ module BestChange
       list = source_rows.map do |row|
         base_rate_percent = calculate_comission(row.rate, base_rate_multiplicator).round ROUND
         base_rate_percent = Record::NULL_STUB if base_rate_percent.is_a?(Float) && base_rate_percent.nan?
+        position = row.is_my? ? row.position - 1 : row.position
         bcr = Record.new(
           exchanger_id:      row.exchanger_id,
           exchanger_name:    row.exchanger_name,
