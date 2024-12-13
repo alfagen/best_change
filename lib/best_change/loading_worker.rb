@@ -1,7 +1,3 @@
-require 'open-uri'
-require 'rcsv'
-require 'benchmark'
-require 'zip'
 require 'sidekiq'
 
 module BestChange
@@ -11,124 +7,39 @@ module BestChange
 
     sidekiq_options queue: :critical, retry: false, lock: :until_executed
 
-    OPEN_TIMEOUT = 1
-    READ_TIMEOUT = 10
-
-    # Было: http://www.bestchange.ru/bm/info.zip
-    #
-    URL = URI.parse 'http://api.bestchange.ru/info.zip'
-
+    EXCHANGERS_BASE_URL = 'https://www.bestchange.app/v2/fe3fc3f28942d637d70cd09bc1c2b978/changers/ru'
     def perform
-      logger.info "Start"
-      directions = {}
+      uri = URI(EXCHANGERS_BASE_URL)
+      response = Net::HTTP.get(uri)
+      exchangers = {}
+      JSON.parse(response)['changers'].each do |e|
+        exchangers[e['id']] = e['name']
+      end
+      exchangers_json = exchangers.to_json
+      all_rates = []
+      Gera::ExchangeRate.includes(:payment_system_from, :payment_system_to).find_each(batch_size: 499) do |e|
+        id_from = e.payment_system_from.bestchange_id
+        id_to = e.payment_system_to.bestchange_id
+        next if id_from.blank? || id_from == 0
+        next if id_to.blank? || id_to == 0
 
-      total_bm = Benchmark.measure do
-        bm = Benchmark.measure do
-          unpack open URL, read_timeout: READ_TIMEOUT, open_timeout: OPEN_TIMEOUT
-        end
-
-        logger.info "Download (#{URL}) and unpack done (bm_rates.count: #{bm_rates.count}, benchmark: #{bm.real})"
-
-        # 0 - ps1
-        # 1 - ps2
-        # 2 - обменник
-        # 3 - отдате (сумма)
-        # 4 - получаете (сумма) курс = 4/3
-        # 5 - резерв
-        # 6 - ?
-        # 7 - ?
-        bm = Benchmark.measure do
-          bm_rates.each do |row|
-            add_row directions, row
-          end
-        end
-
-        logger.info "Build done (directions: #{directions.count}, benchmark: #{bm.real})"
-
-        bm = Benchmark.measure do
-          directions.each do |key, list|
-            BestChange::Repository.setRows key, list.sort
-          end
-        end
-        logger.info "Store done (benchmark: #{bm.real})"
+        all_rates << "#{id_from}-#{id_to}"
       end
 
-      logger.info "Finish (total benchmark: #{total_bm.real})\n"
+      time = Time.zone.now.to_i
+      all_rates.each_slice(499).each do |rates|
+        BatchLoadingWorker.perform_async(rates.join('+'), time, exchangers_json)
+      end
 
-      exchange_rate_ids1 = Gera::TargetAutorateSetting.where('updated_at >= ?', 2.minutes.ago).pluck(:exchange_rate_id)
-      exchange_rate_ids2 = Gera::ExchangeRate.where('updated_at >= ?', 2.minutes.ago).pluck(:id)
+      sleep 3
+
+      exchange_rate_ids1 = Gera::TargetAutorateSetting.where('updated_at >= ?', 30.seconds.ago).pluck(:exchange_rate_id)
+      exchange_rate_ids2 = Gera::ExchangeRate.where('updated_at >= ?', 30.seconds.ago).pluck(:id)
       exchange_rate_ids = (exchange_rate_ids1 + exchange_rate_ids2)
       Gera::DirectionRateSnapshot.last.direction_rates.where(exchange_rate_id: exchange_rate_ids).each do |dr|
         dr.calculate_rate
         dr.save!
       end
-
-      directions.count
-    end
-
-    # rates = bm_rates
-    # id_best = link_id[v[0]][v[1]]
-    # id_exch = v[2]  exchanger_id = v[2].to_i
-    # reserf = v[5]
-    # outm = v[4] / v[3]
-    # take = 1
-    # type_cy1 = bank_idb[v[0]][:type_cy]
-    # name_change = exchanger_names[exchanger_id]
-
-    private
-
-    attr_reader :bm_rates, :bm_exch
-
-    def add_row(directions, row)
-      ps1, ps2, exchanger_id, buy_price, sell_price, reserve = row
-      exchanger_id = exchanger_id.to_i
-      buy_price    = buy_price.to_f
-      sell_price   = sell_price.to_f
-      key          = BestChange::Repository.generate_key_from_bestchange_ids ps1, ps2, 'bestchange'
-
-      d = directions[key] ||= []
-      d << BestChange::Row.new(
-        exchanger_id:   exchanger_id,
-        exchanger_name: exchanger_names[exchanger_id] || "Exchanger #{exchanger_id}",
-        buy_price:      buy_price,
-        sell_price:     sell_price,
-        reserve:        reserve,
-        time:           time
-      )
-    end
-
-    def exchanger_names
-      @exchanger_names ||= bm_exch.each_with_object({}) { |l, h| h[l[0].to_i] = l[1] }
-    end
-
-    # отдаете 702 689.1892
-    # от 2810.76
-    # получаете 1 BTC
-    # резерв 9.25
-    # отзывы 0/4855
-    # https://www.bestchange.ru/qiwi-to-bitcoin.html
-    # https://www.bestchange.ru/click.php?id=522&from=63&to=93
-    # r.find { |a| a[0].to_i == 63 && a[1].to_i == 93 && a[2].to_i == 522 }
-    def unpack(file)
-      Zip::File.open file do |zip_file|
-        # Список обменников
-        # Пример: ["522", "Касса", nil, "0", "601454"]
-        @bm_exch = parse_csv zip_file.glob('bm_exch.dat').first.get_input_stream.read
-
-        # rateindex = (1 - $v[4] * $list_kurs[$list_item['type_cy1']][$list_item['type_cy2']][0] / $v[3]) * 100
-        # outm = v[4] / v[3]
-        #  ps1,  ps2, exchanger_id, отдаете, получаете, reserv, ?, ?
-        # ["63", "93", "522", "702689.18918919", "1", "9.24", "0.0", "1"]
-        @bm_rates = parse_csv zip_file.glob('bm_rates.dat').first.get_input_stream.read
-      end
-    end
-
-    def parse_csv(content)
-      Rcsv.parse content.force_encoding('cp1251').encode, column_separator: ';'
-    end
-
-    def time
-      @time ||= Time.zone.now.to_i
     end
   end
 end

@@ -17,6 +17,7 @@ require "best_change/status_serializer"
 require "best_change/configuration"
 require "best_change/trustee_loading_worker"
 require "best_change/trustee_saver_worker"
+require "best_change/batch_loading_worker"
 
 module BestChange
   class << self
