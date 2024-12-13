@@ -9,9 +9,12 @@ module BestChange
 
     def perform(exchange_rates, timestamp)
       go_program_path = File.expand_path("~/bestchange_fetcher/main")
-      bm = Benchmark.measure { output = `#{go_program_path} #{exchange_rates} #{timestamp}` }
+      bm = Benchmark.measure do
+        output = `#{go_program_path} #{exchange_rates} #{timestamp}`
+        logger.info output
+      end
 
-      logger.info "#{bm.real}: #{output}"
+      logger.info bm.real
     end
   end
 end
