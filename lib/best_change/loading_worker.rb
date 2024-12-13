@@ -31,7 +31,7 @@ module BestChange
         BatchLoadingWorker.perform_async(rates.join('+'), time, exchangers_json)
       end
 
-      sleep 5
+      sleep 3
 
       exchange_rate_ids1 = Gera::TargetAutorateSetting.where('updated_at >= ?', 30.seconds.ago).pluck(:exchange_rate_id)
       exchange_rate_ids2 = Gera::ExchangeRate.where('updated_at >= ?', 30.seconds.ago).pluck(:id)
