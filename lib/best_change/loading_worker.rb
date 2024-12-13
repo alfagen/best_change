@@ -20,7 +20,7 @@ module BestChange
 
       time = Time.zone.now.to_i
       all_rates.each_slice(499).each do |rates|
-        BatchLoadingWorker.perform_async(rates, time)
+        BatchLoadingWorker.perform_async(rates.join('+'), time)
       end
 
       sleep 5
