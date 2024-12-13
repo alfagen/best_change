@@ -11,7 +11,6 @@ module BestChange
       go_program_path = File.expand_path("~/bestchange_fetcher/main")
       bm = Benchmark.measure do
         output = `#{go_program_path} #{exchange_rates} #{timestamp} #{exchangers_json}`
-        logger.info output
       end
 
       logger.info bm.real
