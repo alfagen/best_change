@@ -25,6 +25,6 @@ class BestChange::Row
   end
 
   def rate
-    sell_price / buy_price
+    sell_price.to_f / buy_price
   end
 end
