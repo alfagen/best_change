@@ -32,6 +32,8 @@ module BestChange
         dr.calculate_rate
         dr.save!
       end
+
+      BestChangeRatesExportWorker.new.perform
     end
   end
 end
