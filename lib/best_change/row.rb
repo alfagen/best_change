@@ -12,7 +12,7 @@ class BestChange::Row
   attr_accessor :position
 
   def is_my?
-    exchanger_id == BestChange.configuration.exchanger_id || exchanger_name == 'KASSA'
+    @is_my ||= (exchanger_id == BestChange.configuration.exchanger_id || exchanger_name == 'KASSA')
   end
 
   # Для сериализатора
@@ -25,6 +25,6 @@ class BestChange::Row
   end
 
   def rate
-    sell_price / buy_price
+    sell_price.to_f / buy_price
   end
 end

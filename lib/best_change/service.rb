@@ -36,11 +36,16 @@ module BestChange
         base_rate_percent = calculate_comission(row.rate, base_rate_multiplicator).round ROUND
         base_rate_percent = Record::NULL_STUB if base_rate_percent.is_a?(Float) && base_rate_percent.nan?
         position = row.is_my? ? row.position - 1 : row.position
+        buy_price = row.buy_price
+        sell_price = row.sell_price
+        buy_price = calculate_future if row.is_my? && buy_price != 1
+        sell_price = calculate_future if row.is_my? && sell_price != 1
+
         bcr = Record.new(
           exchanger_id:      row.exchanger_id,
           exchanger_name:    row.exchanger_name,
-          buy_price:         row.buy_price,
-          sell_price:        row.sell_price,
+          buy_price:         buy_price,
+          sell_price:        sell_price,
           reserve:           row.reserve,
           time:              row.time,
           position:          row.position,
@@ -108,6 +113,13 @@ module BestChange
     def base_rate_multiplicator
       # TODO вынести в конфиг
       @base_rate_multiplicator ||= Gera::Universe.currency_rates_repository.find_currency_rate_by_pair(currency_pair).rate_value
+    end
+
+    def calculate_future
+      dr = Gera::DirectionRateSnapshot.last.direction_rates.find_by(exchange_rate_id: exchange_rate.id)
+      rate = dr.send :calculate_finite_rate, dr.currency_rate.rate_value, exchange_rate.final_rate_percents
+      rate = 1 / rate if rate < 1
+      rate 
     end
   end
 end
