@@ -39,7 +39,7 @@ module BestChange
         buy_price = row.buy_price
         sell_price = row.sell_price
         buy_price = calculate_future if row.is_my? && buy_price != 1
-        sell_price = calculate_future if row.is_my? && buy_price != 1
+        sell_price = calculate_future if row.is_my? && sell_price != 1
 
         bcr = Record.new(
           exchanger_id:      row.exchanger_id,
