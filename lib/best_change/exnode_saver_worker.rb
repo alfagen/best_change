@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module BestChange
-  class TrusteeSaverWorker
+  class ExnodeSaverWorker
     include ::Sidekiq::Worker
 
     sidekiq_options queue: :default, retry: 2
