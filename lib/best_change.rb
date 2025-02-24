@@ -18,6 +18,8 @@ require "best_change/configuration"
 require "best_change/trustee_loading_worker"
 require "best_change/trustee_saver_worker"
 require "best_change/batch_loading_worker"
+require "best_change/exnode_loading_worker"
+require "best_change/exnode_saver_worker"
 
 module BestChange
   class << self
