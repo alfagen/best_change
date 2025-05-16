@@ -10,7 +10,7 @@ module BestChange
     def perform
       bm = Benchmark.measure do
         all_rates = []
-        Gera::ExchangeRate.available.includes(:payment_system_from, :payment_system_to).find_each(batch_size: 499) do |e|
+        Gera::ExchangeRate.available_for_parser.includes(:payment_system_from, :payment_system_to).find_each(batch_size: 499) do |e|
           id_from = e.payment_system_from.bestchange_id
           id_to = e.payment_system_to.bestchange_id
           next if id_from.blank? || id_from == 0
