@@ -24,7 +24,7 @@ module BestChange
     # возвращает список BestChange::Row
     def getRows(key)
       bestchange_cache = DRbObject.new_with_uri(PRELOADED_REDIS_DATA)
-      bestchange_cache.preloaded_data(key)
+      bestchange_cache.preloaded_data(key) || []
     end
 
     def setRows(key, data)
