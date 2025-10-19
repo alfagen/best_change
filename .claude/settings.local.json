@@ -3,7 +3,8 @@
     "allow": [
       "Bash(bundle exec rake:*)",
       "Bash(bundle install:*)",
-      "Bash(bundle:*)"
+      "Bash(bundle:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []
