@@ -1,6 +1,27 @@
 # require 'gera/methematic'
 
 module BestChange
+  BestChangeRecord = Struct.new(
+    :exchanger_id, :exchanger_name, :buy_price, :sell_price,
+    :reserve, :time, :position, :base_rate_percent, :target_rate_percent,
+    keyword_init: true
+  ) do
+    include Comparable
+    NULL_STUB = 9999
+
+    def is_my?
+      exchanger_id == BestChange.configuration.exchanger_id
+    end
+
+    def rate
+      sell_price / buy_price
+    end
+
+    def <=>(other)
+      (target_rate_percent || NULL_STUB) <=> (other.target_rate_percent || NULL_STUB)
+    end
+  end
+
   class Service
     ROUND = 4
     include Virtus.model strict: true
@@ -34,10 +55,10 @@ module BestChange
 
       list = source_rows.map do |row|
         base_rate_percent = calculate_comission(row.rate, base_rate_multiplicator).round ROUND
-        base_rate_percent = Record::NULL_STUB if base_rate_percent.is_a?(Float) && base_rate_percent.nan?
+        base_rate_percent = BestChangeRecord::NULL_STUB if base_rate_percent.is_a?(Float) && base_rate_percent.nan?
         position = row.is_my? ? row.position - 1 : row.position
 
-        bcr = Record.new(
+        bcr = BestChangeRecord.new(
           exchanger_id:      row.exchanger_id,
           exchanger_name:    row.exchanger_name,
           buy_price:         row.buy_price,
@@ -73,8 +94,8 @@ module BestChange
         next if row.is_my?
 
         base_rate_percent = calculate_comission(row.rate, base_rate_multiplicator).round ROUND
-        base_rate_percent = Record::NULL_STUB if base_rate_percent.is_a?(Float) && base_rate_percent.nan?
-        Record.new(
+        base_rate_percent = BestChangeRecord::NULL_STUB if base_rate_percent.is_a?(Float) && base_rate_percent.nan?
+        BestChangeRecord.new(
           exchanger_id:      row.exchanger_id,
           exchanger_name:    row.exchanger_name,
           buy_price:         row.buy_price,
