@@ -1,4 +1,5 @@
 require 'oj'
+require 'drb/drb'
 
 # Класс нужно предварительно загрузить, чтобы Oj его использовал
 require_relative 'row'
