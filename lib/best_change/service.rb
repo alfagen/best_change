@@ -3,7 +3,7 @@
 module BestChange
   BestChangeRecord = Struct.new(
     :exchanger_id, :exchanger_name, :buy_price, :sell_price,
-    :reserve, :time, :position, :base_rate_percent, :target_rate_percent, :status
+    :reserve, :time, :position, :base_rate_percent, :target_rate_percent, :status,
     keyword_init: true
   ) do
     include Comparable
