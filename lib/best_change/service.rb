@@ -9,6 +9,10 @@ module BestChange
     include Comparable
     NULL_STUB = 9999
 
+    def id
+      exchanger_id
+    end
+
     def is_my?
       exchanger_id == BestChange.configuration.exchanger_id
     end
