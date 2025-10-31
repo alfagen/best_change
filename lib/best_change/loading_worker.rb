@@ -10,7 +10,7 @@ module BestChange
     def perform
       bm = Benchmark.measure do
         all_rates = []
-        Gera::ExchangeRate.available_for_parser.includes(:payment_system_from, :payment_system_to).find_each(batch_size: 499) do |e|
+        Gera::ExchangeRate.includes(:payment_system_from, :payment_system_to).find_each(batch_size: 499) do |e|
           id_from = e.payment_system_from.bestchange_id
           id_to = e.payment_system_to.bestchange_id
           next if id_from.blank? || id_from == 0
@@ -20,8 +20,12 @@ module BestChange
         end
 
         time = Time.zone.now.to_i
-        all_rates.each_slice(499).each do |rates|
+        api_limit_counter = 0
+        all_rates.each_slice(499) do |rates|
           BatchLoadingWorker.perform_async(rates.join('+'), time)
+
+          api_limit_counter += 1
+          sleep 2 if api_limit_counter % 20 == 0
         end
 
         sleep 3
