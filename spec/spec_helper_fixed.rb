@@ -58,10 +58,15 @@ RSpec.configure do |config|
     # Добавляем путь к фабрикам гема gera
     gem_spec = Gem::Specification.find_by_name('gera')
     gera_factories_path = File.join(gem_spec.gem_dir, 'factories')
-    # Temporarily skip gera factories due to CurrencyRateHistoryInterval issue
-    # FactoryBot.definition_file_paths << gera_factories_path if Dir.exist?(gera_factories_path)
 
-    puts "FactoryBot definition file paths (filtered - gera factories skipped):"
+    # Temporary fix: Skip problematic factory files
+    FactoryBot.definition_file_paths = [
+      'factories',
+      'test/factories',
+      'spec/factories'
+    ]
+
+    puts "FactoryBot definition file paths (filtered):"
     puts FactoryBot.definition_file_paths
     FactoryBot.find_definitions
   end

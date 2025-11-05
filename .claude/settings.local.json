@@ -4,7 +4,18 @@
       "Bash(bundle exec rake:*)",
       "Bash(bundle install:*)",
       "Bash(bundle:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(ruby:*)",
+      "Bash(bundler --version:*)",
+      "Bash(gem install:*)",
+      "Bash(gem list:*)",
+      "Bash(gem uninstall:*)",
+      "Bash(find:*)",
+      "Bash(ln:*)",
+      "Bash(for:*)",
+      "Bash(do mv:*)",
+      "Bash(done:*)",
+      "Bash(DISABLE_GERA_FACTORIES=true bundle exec ruby:*)"
     ],
     "deny": [],
     "ask": []

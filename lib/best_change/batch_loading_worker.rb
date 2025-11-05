@@ -8,9 +8,8 @@ module BestChange
     sidekiq_options queue: :critical, retry: false
 
     def perform(exchange_rates, timestamp)
-      go_program_path = File.expand_path("~/bestchange_fetcher/main")
       bm = Benchmark.measure do
-        output = `#{go_program_path} #{exchange_rates} #{timestamp}`
+        `#{BestChange.configuration.fetcher_full_path} #{exchange_rates} #{timestamp}`
       end
 
       logger.info bm.real
