@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 
-gem 'gera', github: 'alfagen/gera', branch: 'chore/upgrade-rails-to-8'
+gem 'gera', github: 'alfagen/gera'
 
 # Можно перейти в master если туда влили этот PR https://github.com/Netflix/fast_jsonapi/pull/230
 # Данные изменения отлавливаются в spec/serializers/order_serializer_spec.rb
@@ -13,6 +13,8 @@ gem "concurrent-ruby", "~> 1.3"
 
 # Для gera
 gem 'noty_flash', github: 'BrandyMint/noty_flash'
+
+gem 'activesupport', '~> 8.0.1'
 
 
 gemspec

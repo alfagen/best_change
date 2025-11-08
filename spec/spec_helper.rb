@@ -13,9 +13,11 @@ require 'auto_logger'
 require 'fast_jsonapi'
 require 'sidekiq'
 require 'factory_bot'
-require 'gera'
 
 require 'money'
+require 'gera'
+require "gera/engine"
+require "gera/railtie"
 require 'active_support'
 require 'active_support/core_ext'
 require 'active_support/core_ext/module/delegation'
@@ -25,6 +27,11 @@ require 'active_support/core_ext/module'
 require "best_change"
 
 Gera::MoneySupport.init
+
+gem_spec = Gem::Specification.find_by_name('gera')
+gera_factories_path = File.join(gem_spec.gem_dir, 'factories')
+FactoryBot.definition_file_paths << gera_factories_path
+FactoryBot.find_definitions
 
 BestChange.configure do |config|
   config.redis = "redis://#{ENV['REDIS_HOST'] || 'localhost' }:6379/1"
@@ -55,15 +62,6 @@ RSpec.configure do |config|
   end
 
   config.before(:suite) do
-    # Добавляем путь к фабрикам гема gera
-    gem_spec = Gem::Specification.find_by_name('gera')
-    gera_factories_path = File.join(gem_spec.gem_dir, 'factories')
-    # Temporarily skip gera factories due to CurrencyRateHistoryInterval issue
-    # FactoryBot.definition_file_paths << gera_factories_path if Dir.exist?(gera_factories_path)
-
-    puts "FactoryBot definition file paths (filtered - gera factories skipped):"
-    puts FactoryBot.definition_file_paths
-    FactoryBot.find_definitions
   end
 
   config.expect_with :rspec do |c|

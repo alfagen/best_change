@@ -15,7 +15,9 @@
       "Bash(for:*)",
       "Bash(do mv:*)",
       "Bash(done:*)",
-      "Bash(DISABLE_GERA_FACTORIES=true bundle exec ruby:*)"
+      "Bash(DISABLE_GERA_FACTORIES=true bundle exec ruby:*)",
+      "Bash(DISABLE_GERA_FACTORIES=true bundle exec rake:*)",
+      "Bash(gem build:*)"
     ],
     "deny": [],
     "ask": []
