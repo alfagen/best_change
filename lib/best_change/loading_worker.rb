@@ -25,20 +25,20 @@ module BestChange
           BatchLoadingWorker.perform_async(rates.join('+'), time)
 
           api_limit_counter += 1
-          sleep 2 if api_limit_counter % 20 == 0
         end
 
-        sleep 3
+        sleep 2
 
         exchange_rate_ids1 = Gera::TargetAutorateSetting.where('updated_at >= ?', 30.seconds.ago).pluck(:exchange_rate_id)
         exchange_rate_ids2 = Gera::ExchangeRate.where('updated_at >= ?', 30.seconds.ago).pluck(:id)
-        exchange_rate_ids = (exchange_rate_ids1 + exchange_rate_ids2)
+        exchange_rate_ids = (exchange_rate_ids1 + exchange_rate_ids2).uniq
         Gera::DirectionRateSnapshot.last.direction_rates.where(exchange_rate_id: exchange_rate_ids).each do |dr|
           dr.calculate_rate
           dr.save!
         end
 
-        BestChangeRatesExportWorker.new.perform
+        BestChangeRatesExportWorker.perform_async
+        GenerateCompositeStatusWorker.perform_async
       end
 
       logger.info bm.real
