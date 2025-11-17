@@ -57,6 +57,11 @@ Gem::Specification.new do |spec|
     # для axlsx
     spec.add_dependency 'zip-zip'
 
+    # Rails Engine dependencies
+    spec.add_dependency 'rails', '>= 6.1'
+    spec.add_dependency 'sqlite3'
+    spec.add_dependency 'mysql2'
+
     spec.add_development_dependency "bundler"
     spec.add_development_dependency "rake"
     spec.add_development_dependency "rspec"
@@ -75,10 +80,10 @@ Gem::Specification.new do |spec|
     spec.add_development_dependency 'factory_bot_rails'
     spec.add_development_dependency 'rspec-rails'
     spec.add_development_dependency 'database_rewinder'
-    spec.add_development_dependency 'mysql2'
     spec.add_development_dependency 'vcr'
     spec.add_development_dependency 'webmock'
     spec.add_development_dependency 'timecop'
     spec.add_development_dependency 'yard'
     spec.add_development_dependency 'yard-rspec'
+    spec.add_development_dependency 'brakeman'  # Security scanning
 end

@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'best_change/row'
 
-RSpec.describe BestChange::PositionService, type: :services do
+RSpec.describe BestChange::PositionService, type: :service do
   include Gera::Mathematic
 
 	let(:br_data) { Oj.load(File.read 'spec/fixtures/bestchange.json').each_with_index { |row, index| row.position = index }  }
@@ -11,8 +11,8 @@ RSpec.describe BestChange::PositionService, type: :services do
   # Рейт из bestchange data
   let!(:current_rate)       { Gera::Rate.new in_amount: 640307.14285714, out_amount: 1.0 }
   let!(:currency_pair)      { Gera::CurrencyPair.new RUB, BTC }
-  let(:payment_system_from) { create :payment_system, type_cy: currency_pair.first.local_id } # RUB
-  let(:payment_system_to)   { create :payment_system, type_cy: currency_pair.second.local_id } # BTC
+  let(:payment_system_from) { create :gera_payment_system, currency: currency_pair.first } # RUB
+  let(:payment_system_to)   { create :gera_payment_system, currency: currency_pair.second } # BTC
   let(:direction)           { Gera::Direction.new payment_system_from: payment_system_from, payment_system_to: payment_system_to }
 
   # (СберОнлайн->Bitcoin)
@@ -50,6 +50,11 @@ RSpec.describe BestChange::PositionService, type: :services do
   before do
     exchange_rate.update comission: comission
     allow_any_instance_of(ExchangeRate).to receive(:validate_rate_bestchange_comission).and_return true
+
+    # Mock the Universe.currency_rates_repository to avoid UnknownPair errors
+    allow(Gera::Universe).to receive(:currency_rates_repository).and_return(
+      double('currency_rates_repository', find_currency_rate_by_pair: OpenStruct.new(rate_value: 1.7179255491226387e-06))
+    )
   end
 
   subject do

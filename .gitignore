@@ -10,3 +10,39 @@
 
 # rspec failure tracking
 .rspec_status
+
+# Rails Engine specific
+*.gem
+Gemfile.lock
+gemfiles/*.lock
+spec/dummy/db/*.sqlite3
+spec/dummy/log/*
+spec/dummy/tmp/*
+spec/dummy/.sass-cache
+spec/dummy/public/assets
+spec/dummy/.bundle
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Security files
+config/master.key
+config/credentials.yml.enc

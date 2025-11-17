@@ -1,0 +1,18 @@
+source 'https://rubygems.org'
+
+gem 'rails', '~> 7.0' # Compatible with best_change gem requirements
+
+# Test dependencies
+group :test do
+  gem 'rspec-rails'
+  gem 'factory_bot_rails'
+  gem 'faker'
+  gem 'vcr'
+  gem 'webmock'
+  gem 'best_change', path: '../../'
+end
+
+# Development dependencies
+group :development do
+  gem 'listen'
+end
