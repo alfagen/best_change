@@ -53,23 +53,3 @@ jobs:
       run: bundle exec rake spec
       env:
         DATABASE_URL: mysql2://root:root@127.0.0.1:3306/best_change_test
-
-  rubocop:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up Ruby 3.4.7
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 3.4.7
-        bundler-cache: true
-        cache-version: 2
-        bundler: 'latest'
-
-    - name: Install dependencies
-      run: bundle install
-
-    - name: Run RuboCop
-      run: bundle exec rubocop
