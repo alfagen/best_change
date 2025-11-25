@@ -35,16 +35,29 @@ module Gera
   end
 
   class PaymentSystem
-    attr_accessor :currency, :name, :priority, :income_enabled, :outcome_enabled, :type_cy, :bestchange_id
+    attr_accessor :id, :currency, :name, :priority, :income_enabled, :outcome_enabled, :type_cy, :bestchange_id
+
+    @@instances = []
 
     def self.create!(attributes = {})
-      new(attributes)
+      instance = new(attributes)
+      @@instances << instance
+      instance
+    end
+
+    def self.pluck(*columns)
+      @@instances.map { |i| columns.map { |c| i.send(c) } }
+    end
+
+    def self.clear_instances!
+      @@instances = []
     end
 
     def initialize(attributes = {})
       attributes.each { |key, value| send("#{key}=", value) if respond_to?("#{key}=") }
       @currency ||= OpenStruct.new
       @bestchange_id ||= 1
+      @id ||= rand(1..10000)
     end
 
     def save!
@@ -66,10 +79,19 @@ module Gera
   end
 
   class ExchangeRate
-    attr_accessor :id, :payment_system_from, :payment_system_to, :value, :is_enabled, :comission, :bestchange_key, :currency_pair
+    attr_accessor :id, :payment_system_from, :payment_system_to, :value, :is_enabled, :comission, :bestchange_key, :currency_pair,
+                  :income_payment_system_id, :outcome_payment_system_id
+
+    @@instances = []
 
     def self.create!(attributes = {})
-      new(attributes)
+      instance = new(attributes)
+      @@instances << instance
+      instance
+    end
+
+    def self.find(id)
+      @@instances.find { |i| i.id == id }
     end
 
     def self.find_or_create_by(attributes)
@@ -84,8 +106,8 @@ module Gera
       self
     end
 
-    def self.where(conditions)
-      [new]
+    def self.where(*args)
+      MockRelation.new([new])
     end
 
     def self.enabled
@@ -94,6 +116,14 @@ module Gera
 
     def self.available_for_parser
       self
+    end
+
+    def self.pluck(*columns)
+      @@instances.map { |i| columns.map { |c| i.send(c) } }
+    end
+
+    def self.clear_instances!
+      @@instances = []
     end
 
     def self.find_each(batch_size: 1000, &block)
@@ -105,6 +135,7 @@ module Gera
       @id ||= rand(1000..9999)  # Generate a random ID if not provided
       @payment_system_from ||= OpenStruct.new(currency: OpenStruct.new)
       @payment_system_to ||= OpenStruct.new(currency: OpenStruct.new)
+      @@instances << self unless @@instances.include?(self)
     end
 
     def save!
@@ -196,12 +227,15 @@ module Gera
     def initialize(attributes = {})
       attributes.each { |key, value| send("#{key}=", value) if respond_to?("#{key}=") }
 
-      # If rate_value is not provided but currency_rate is, derive it from base_rate_value and commission
-      if !@rate_value && @currency_rate && @base_rate_value
-        # rate_value should be base_rate_value / (1 + commission/100)
-        # We need to find commission first or use a default
+      # If rate_value is not provided but base_rate_value is, derive it using Gera::Mathematic formula
+      if !@rate_value && @base_rate_value
         @comission = 10.0 if @comission.nil?
-        @rate_value = @base_rate_value / (1 + @comission / 100.0)
+        # Use the same formula as Gera::Mathematic.calculate_finite_rate
+        if @base_rate_value <= 1
+          @rate_value = @base_rate_value * (1.0 - @comission / 100.0)
+        else
+          @rate_value = @base_rate_value - (@comission * @base_rate_value / 100.0)
+        end
       end
 
       # Calculate commission if we have rate_value and base_rate_value but no commission
@@ -267,6 +301,10 @@ module Gera
     def to_ary
       @direction_rates
     end
+
+    def where(conditions)
+      MockRelation.new(@direction_rates)
+    end
   end
 
   class DirectionRateSnapshot
@@ -274,6 +312,10 @@ module Gera
 
     def self.create!(attributes = {})
       new(attributes)
+    end
+
+    def self.last
+      new
     end
 
     def initialize(attributes = {})
@@ -287,6 +329,30 @@ module Gera
 
     def save!
       true
+    end
+  end
+
+  class MockRelation
+    def initialize(items)
+      @items = items
+    end
+
+    def pluck(*columns)
+      @items.map { |i| columns.map { |c| i.send(c) rescue nil } }
+    end
+
+    def where(conditions)
+      MockRelation.new(@items)
+    end
+
+    def each(&block)
+      @items.each(&block)
+    end
+  end
+
+  class TargetAutorateSetting
+    def self.where(*args)
+      MockRelation.new([])
     end
   end
 
@@ -427,11 +493,15 @@ module Gera
   end
 
   class ExchangeRateUpdaterWorker
-  def self.perform_in(delay, id, attributes)
-    # Stub for Sidekiq worker - just return success
-    true
+    def self.perform_in(delay, id, attributes)
+      # Find the exchange rate and update its attributes
+      exchange_rate = Gera::ExchangeRate.find(id)
+      if exchange_rate && attributes
+        exchange_rate.update(attributes)
+      end
+      true
+    end
   end
-end
 
 # MoneySupport - это модуль в геме gera, не трогаем его
 end

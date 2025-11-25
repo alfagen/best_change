@@ -46,7 +46,7 @@ module BestChange
           time:              row.time,
           position:          row.position,
           base_rate_percent: base_rate_percent,
-          target_rate_percent: base_rate_percent
+          target_rate_percent: row.is_my? ? exchange_rate.comission : base_rate_percent
         )
 
         if row.is_my?

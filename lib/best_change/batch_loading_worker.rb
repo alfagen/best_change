@@ -1,0 +1,14 @@
+require 'sidekiq'
+
+module BestChange
+  class BatchLoadingWorker
+    include ::Sidekiq::Worker
+    include ::AutoLogger
+
+    sidekiq_options queue: :critical, retry: false
+
+    def perform(exchange_rates, timestamp)
+      `#{BestChange.configuration.fetcher_path} #{exchange_rates} #{timestamp}`
+    end
+  end
+end

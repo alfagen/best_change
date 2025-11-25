@@ -8,7 +8,7 @@ gem 'gera', github: 'alfagen/gera'
 # Данные изменения отлавливаются в spec/serializers/order_serializer_spec.rb
 gem 'fast_jsonapi', github: 'HoJSim/fast_jsonapi', branch: 'dev'
 # Specify your gem's dependencies in best_change.gemspec
-gem "redis", "~> 4.0", :require => ["redis", "redis/connection/hiredis"]
+gem "redis", "~> 4.0"
 gem "concurrent-ruby", "~> 1.3"
 
 # Для gera
