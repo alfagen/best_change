@@ -46,3 +46,4 @@ Thumbs.db
 # Security files
 config/master.key
 config/credentials.yml.enc
+.claude/settings.local.json
