@@ -1,5 +1,10 @@
 require 'gera'
 
+# Load Rails Engine if Rails is available
+if defined?(Rails)
+  require "best_change/engine"
+end
+
 require "best_change/version"
 require "best_change/redis_repository"
 require "best_change/last_pull"
@@ -17,7 +22,6 @@ require "best_change/status_serializer"
 require "best_change/configuration"
 require "best_change/trustee_loading_worker"
 require "best_change/trustee_saver_worker"
-require "best_change/batch_loading_worker"
 
 module BestChange
   class << self
@@ -27,5 +31,13 @@ module BestChange
   def self.configure
     self.configuration ||= Configuration.new
     yield(configuration)
+  end
+
+  def self.service
+    @service ||= Service.new
+  end
+
+  def self.repository
+    @repository ||= Repository.new(configuration.redis)
   end
 end

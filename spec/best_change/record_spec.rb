@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe BestChange::Record do
+RSpec.describe BestChange::Record, type: :model do
   let(:nan) { 1.0 / 0.0 - 1.0 / 0.0 }
 
   let!(:b1) {

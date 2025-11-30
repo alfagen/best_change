@@ -34,7 +34,7 @@ module BestChange
           dr.save!
         end
 
-        BestChangeRatesExportWorker.new.perform
+        BestChange.configuration.rates_export_worker.perform
       end
 
       logger.info bm.real

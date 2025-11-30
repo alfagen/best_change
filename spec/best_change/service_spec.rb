@@ -1,7 +1,15 @@
 require 'spec_helper'
 require 'best_change/row'
 
-RSpec.describe BestChange::Service, type: :services do
+RSpec.describe BestChange::Service, type: :service do
+  before do
+    # Override Universe.currency_rates_repository for tests
+    repository = double("currency_rates_repository")
+    allow(repository).to receive(:find_currency_rate_by_pair).and_return(
+      OpenStruct.new(rate_value: 60.0)
+    )
+    allow(Gera::Universe).to receive(:currency_rates_repository).and_return(repository)
+  end
   let!(:currency_rate) { create :currency_rate }
   let!(:rows) {
     [
@@ -25,7 +33,7 @@ RSpec.describe BestChange::Service, type: :services do
       )
     ]
   }
-  let!(:exchange_rate) { create :exchange_rate }
+  let!(:exchange_rate) { create :gera_exchange_rate }
 
   subject { BestChange::Service.new exchange_rate: exchange_rate }
 
