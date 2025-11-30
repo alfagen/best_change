@@ -43,7 +43,7 @@ GIT
 PATH
   remote: .
   specs:
-    best_change (0.2.0)
+    best_change (0.3.0)
       activesupport
       auto_logger
       fast_jsonapi
