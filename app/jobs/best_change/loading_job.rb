@@ -5,7 +5,7 @@ module BestChange
     include ::AutoLogger
 
     queue_as :critical
-    limits_concurrency to: 1, key: -> { 'best_change_loading' }, duration: 5.minutes
+    limits_concurrency to: 1, key: ->(_job) { 'best_change_loading' }, duration: 5.minutes
 
     def perform
       bm = Benchmark.measure do
