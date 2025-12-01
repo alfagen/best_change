@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
 module BestChange
-  class TrusteeLoadingWorker
-    include ::Sidekiq::Worker
-
-    sidekiq_options retry: false, lock: :until_executed
+  class TrusteeLoadingJob < ApplicationJob
+    limits_concurrency to: 1, key: -> { 'best_change_trustee_loading' }, duration: 5.minutes
 
     def perform
       Gera::ExchangeRate.enabled.find_each do |exchange_rate|
-        TrusteeSaverWorker.perform_async(exchange_rate.id, time)
+        TrusteeSaverJob.perform_later(exchange_rate.id, time)
       end
     end
 

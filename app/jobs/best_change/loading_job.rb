@@ -1,11 +1,11 @@
-require 'sidekiq'
+# frozen_string_literal: true
 
 module BestChange
-  class LoadingWorker
-    include ::Sidekiq::Worker
+  class LoadingJob < ApplicationJob
     include ::AutoLogger
 
-    sidekiq_options queue: :critical, retry: false, lock: :until_executed
+    queue_as :critical
+    limits_concurrency to: 1, key: -> { 'best_change_loading' }, duration: 5.minutes
 
     def perform
       bm = Benchmark.measure do
@@ -21,7 +21,7 @@ module BestChange
 
         time = Time.zone.now.to_i
         all_rates.each_slice(499).each do |rates|
-          BatchLoadingWorker.perform_async(rates.join('+'), time)
+          BatchLoadingJob.perform_later(rates.join('+'), time)
         end
 
         sleep 3
