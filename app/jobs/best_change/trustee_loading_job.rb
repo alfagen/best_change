@@ -2,6 +2,7 @@
 
 module BestChange
   class TrusteeLoadingJob < ApplicationJob
+    queue_as :default
     limits_concurrency to: 1, key: ->(_job) { 'best_change_trustee_loading' }, duration: 5.minutes
 
     def perform
