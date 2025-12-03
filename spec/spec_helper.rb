@@ -60,8 +60,8 @@ end
 FactoryBot.definition_file_paths = [File.join(__dir__, 'factories')]
 FactoryBot.find_definitions
 
-# Stub worker for testing
-class StubRatesExportWorker
+# Stub job for testing
+class StubRatesExportJob
   def perform; end
 end
 
@@ -70,7 +70,7 @@ BestChange.configure do |config|
   config.redis = Redis.new(db: 1, host: ENV['REDIS_HOST'] || 'localhost')
   config.exchanger_id = 522
   config.valuta_access_log = Rails.root.join('tmp', 'valuta_access.log').to_s if defined?(Rails)
-  config.rates_export_worker_class = StubRatesExportWorker
+  config.rates_export_worker_class = StubRatesExportJob
 end
 
 require 'vcr'

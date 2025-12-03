@@ -8,7 +8,7 @@ A Ruby gem that provides an adapter and utilities to work with data from [bestch
 * **Commission Calculation** - Determines commission rates of other exchanges relative to base rates
 * **Competitiveness Analysis** - Determines if current rates are competitive in the market
 * **Rails Engine Integration** - Full Rails Engine with API endpoints and background job support
-* **Background Processing** - Sidekiq-powered background workers for rate processing
+* **Background Processing** - ActiveJob-based background jobs for rate processing
 * **Redis-based Storage** - Fast data storage and caching with Redis
 * **RESTful API** - Built-in API endpoints for accessing exchange rate data
 
@@ -39,7 +39,7 @@ This will:
 * Create `config/initializers/best_change.rb`
 * Add engine routes to `config/routes.rb`
 * Create `config/best_change.yml` configuration file
-* Set up Sidekiq configuration (if Sidekiq is available)
+* Configure ActiveJob queue adapter
 
 ### Manual Installation
 
@@ -88,7 +88,7 @@ BestChange.configure do |config|
   config.exchanger_id = 123               # Your exchanger ID (required)
   config.fetcher_path = '~/fetcher/main'  # Path to fetcher (optional)
   config.valuta_access_log = 'log.txt'    # Access log path (optional)
-  config.auto_start_workers = true        # Enable background workers (default: true)
+  config.auto_start_jobs = true            # Enable background jobs (default: true)
   config.api_enabled = true               # Enable API endpoints (default: true)
   config.logger = Rails.logger            # Logger instance (optional)
 end
@@ -123,21 +123,11 @@ GET /best_change/api/v1/currency_pairs/available
 #### Manual Rate Loading
 
 ```bash
-# Load rates asynchronously (via Sidekiq)
+# Load rates asynchronously (via ActiveJob)
 $ rails best_change:load_rates
 
 # Load rates synchronously (blocking)
 $ rails best_change:load_rates_sync
-```
-
-#### Automatic Monitoring
-
-```bash
-# Start automatic monitoring (requires sidekiq-cron)
-$ rails best_change:start_monitoring
-
-# Stop automatic monitoring
-$ rails best_change:stop_monitoring
 ```
 
 #### Configuration Check
@@ -169,17 +159,17 @@ status = service.get_status_summary
 pairs = service.get_available_currency_pairs
 ```
 
-### Custom Workers
+### Custom Jobs
 
-Generate custom workers:
+Generate custom jobs:
 
 ```bash
-$ rails generate best_change:worker MyCustomWorker
+$ rails generate best_change:job MyCustomJob
 ```
 
 This creates:
-* `app/workers/my_custom_worker.rb`
-* `spec/workers/my_custom_worker_spec.rb`
+* `app/jobs/best_change/my_custom_job.rb`
+* `spec/jobs/best_change/my_custom_job_spec.rb`
 
 ## Development
 
@@ -238,9 +228,9 @@ $ bin/console
 ## Dependencies
 
 ### Runtime Dependencies
-* `rails` (>= 6.0)
+* `rails` (>= 6.1)
 * `redis` (~> 4.0)
-* `sidekiq`
+* `activejob` (included in Rails)
 * `virtus`
 * `gera`
 * `grape`
@@ -256,7 +246,7 @@ $ bin/console
 ## Performance
 
 * **Redis Storage**: Fast O(1) lookup for exchange rates
-* **Background Processing**: Non-blocking rate processing with Sidekiq
+* **Background Processing**: Non-blocking rate processing with ActiveJob
 * **Batch Processing**: Efficient batch processing of rate updates
 * **Caching**: Built-in caching layer for frequently accessed data
 

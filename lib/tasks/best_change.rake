@@ -1,18 +1,16 @@
+# frozen_string_literal: true
+
 namespace :best_change do
   desc "Load BestChange exchange rates"
   task load_rates: :environment do
-    if defined?(Sidekiq)
-      BestChange::RailsLoadingWorker.perform_async
-      puts "BestChange loading job enqueued"
-    else
-      puts "Sidekiq is not available. Please add 'sidekiq' to your Gemfile."
-    end
+    BestChange::LoadingJob.perform_later
+    puts "BestChange loading job enqueued"
   end
 
   desc "Load BestChange exchange rates synchronously"
   task load_rates_sync: :environment do
     puts "Loading BestChange rates synchronously..."
-    BestChange::RailsLoadingWorker.new.perform
+    BestChange::LoadingJob.perform_now
     puts "BestChange rates loaded successfully"
   end
 
@@ -59,36 +57,6 @@ namespace :best_change do
     end
 
     puts "=" * 40
-  end
-
-  desc "Start BestChange monitoring"
-  task start_monitoring: :environment do
-    puts "Starting BestChange monitoring..."
-
-    if defined?(Sidekiq::Cron)
-      # Set up cron job for periodic loading
-      Sidekiq::Cron::Job.create(name: 'best_change_monitoring',
-                                cron: '*/5 * * * *',
-                                class: 'BestChange::RailsLoadingWorker')
-      puts "BestChange monitoring job scheduled to run every 5 minutes"
-    else
-      puts "Sidekiq::Cron not available. Please add 'sidekiq-cron' to your Gemfile for automatic monitoring."
-    end
-  end
-
-  desc "Stop BestChange monitoring"
-  task stop_monitoring: :environment do
-    if defined?(Sidekiq::Cron)
-      job = Sidekiq::Cron::Job.find('best_change_monitoring')
-      if job
-        job.destroy
-        puts "BestChange monitoring job stopped"
-      else
-        puts "No monitoring job found"
-      end
-    else
-      puts "Sidekiq::Cron not available"
-    end
   end
 
   desc "Clear BestChange data from Redis"

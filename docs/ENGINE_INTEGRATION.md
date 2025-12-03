@@ -18,8 +18,8 @@ This document describes the Rails Engine integration for the BestChange gem, whi
    - JSON responses with error handling
    - Health check endpoint
 
-3. **Background Workers (`lib/best_change/*_worker.rb`)**
-   - Rails-compatible Sidekiq workers
+3. **Background Jobs (`app/jobs/best_change/*_job.rb`)**
+   - Rails-compatible ActiveJob classes
    - Enhanced error handling and logging
    - Automatic configuration validation
 
@@ -80,9 +80,6 @@ rails best_change:clear_data          # Clear Redis data
 rails best_change:load_rates          # Async loading
 rails best_change:load_rates_sync     # Sync loading
 
-# Monitoring
-rails best_change:start_monitoring    # Auto monitoring
-rails best_change:stop_monitoring     # Stop monitoring
 ```
 
 ### Generators
@@ -91,8 +88,8 @@ rails best_change:stop_monitoring     # Stop monitoring
 # Installation generator
 rails generate best_change:install
 
-# Custom worker generator
-rails generate best_change:worker MyWorker
+# Custom job generator
+rails generate best_change:job MyJob
 ```
 
 ## Configuration Options
@@ -103,7 +100,7 @@ rails generate best_change:worker MyWorker
 
 ### Optional Configuration
 - `logger` - Logger instance (defaults to Rails.logger)
-- `auto_start_workers` - Enable background workers (default: true)
+- `auto_start_jobs` - Enable background jobs (default: true)
 - `api_enabled` - Enable API endpoints (default: true)
 - `fetcher_path` - Path to fetcher executable
 - `valuta_access_log` - Access log file path
@@ -205,7 +202,7 @@ bundle exec appraisal rails-7.0 bundle exec rake spec
 - Batch operations
 
 ### Background Processing
-- Sidekiq queue management
+- ActiveJob queue management
 - Error retry mechanisms
 - Performance monitoring
 
@@ -258,7 +255,7 @@ end
 2. Run installation generator
 3. Update configuration (optional)
 4. Test API endpoints
-5. Deploy with background workers
+5. Deploy with background jobs
 
 ## Contributing to Engine Development
 
@@ -269,10 +266,10 @@ end
 3. Add corresponding tests
 4. Update documentation
 
-### Adding New Workers
+### Adding New Jobs
 
-1. Create worker in `lib/best_change/`
-2. Follow Rails worker patterns
+1. Create job in `app/jobs/best_change/`
+2. Follow Rails ActiveJob patterns
 3. Add error handling
 4. Create Rake task if needed
 5. Add tests
