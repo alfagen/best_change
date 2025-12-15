@@ -25,10 +25,10 @@ module BestChange
           BatchLoadingWorker.perform_async(rates.join('+'), time)
 
           api_limit_counter += 1
-          sleep 2 if api_limit_counter % 20 == 0
+          sleep 2 if api_limit_counter % 10 == 0
         end
 
-        sleep 3
+        sleep 10
 
         exchange_rate_ids1 = Gera::TargetAutorateSetting.where('updated_at >= ?', 30.seconds.ago).pluck(:exchange_rate_id)
         exchange_rate_ids2 = Gera::ExchangeRate.where('updated_at >= ?', 30.seconds.ago).pluck(:id)
