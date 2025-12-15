@@ -22,6 +22,11 @@ module BestChange
         time = Time.zone.now.to_i
         api_limit_counter = 0
         all_rates.each_slice(499) do |rates|
+            logger.info(
+              worker: 'BestChange::BatchLoadingWorker',
+              args: args
+            )
+
           BatchLoadingWorker.perform_async(rates.join('+'), time)
 
           api_limit_counter += 1
