@@ -37,9 +37,6 @@ module BestChange
           dr.calculate_rate
           dr.save!
         end
-
-        BestChangeRatesExportWorker.new.perform_async
-        GenerateCompositeStatusWorker.new.perform_async
       end
 
       logger.info bm.real
