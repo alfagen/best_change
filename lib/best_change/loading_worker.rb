@@ -24,7 +24,7 @@ module BestChange
         all_rates.each_slice(499) do |rates|
             logger.info(
               worker: 'BestChange::BatchLoadingWorker',
-              args: args
+              args: rates.join('+')
             )
 
           BatchLoadingWorker.perform_async(rates.join('+'), time)
