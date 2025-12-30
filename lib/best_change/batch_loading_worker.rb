@@ -8,7 +8,8 @@ module BestChange
     sidekiq_options queue: :best_change, retry: false
 
     def perform(exchange_rates, timestamp)
-      `#{BestChange.configuration.fetcher_path} #{exchange_rates} #{timestamp}`
+      api_key = Settings.bestchange_api_key
+      `#{BestChange.configuration.fetcher_path} #{exchange_rates} #{timestamp} #{api_key}`
     end
   end
 end
