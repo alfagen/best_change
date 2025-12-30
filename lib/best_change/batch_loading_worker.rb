@@ -5,7 +5,7 @@ module BestChange
     include ::Sidekiq::Worker
     include ::AutoLogger
 
-    sidekiq_options queue: :critical, retry: false
+    sidekiq_options queue: :best_change, retry: false
 
     def perform(exchange_rates, timestamp)
       `#{BestChange.configuration.fetcher_path} #{exchange_rates} #{timestamp}`

@@ -5,7 +5,7 @@ module BestChange
     include ::Sidekiq::Worker
     include ::AutoLogger
 
-    sidekiq_options queue: :critical, retry: false, lock: :until_executed
+    sidekiq_options queue: :best_change, retry: false, lock: :until_executed
 
     def perform
       bm = Benchmark.measure do
