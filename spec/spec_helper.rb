@@ -84,6 +84,9 @@ VCR.configure do |c|
 end
 
 RSpec.configure do |config|
+  # Create log directory for AutoLogger
+  FileUtils.mkdir_p('log')
+
   config.include FactoryBot::Syntax::Methods
 
   # Enable flags like --only-failures and --next-failure

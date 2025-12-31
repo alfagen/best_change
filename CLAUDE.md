@@ -34,10 +34,6 @@ BestChange is a Ruby gem that provides an adapter and utilities to work with dat
 
 ### Background Jobs (ActiveJob)
 
-**LoadingJob (`app/jobs/best_change/loading_job.rb`)**
-- Main background job that processes all available exchange rates
-- Triggers rate calculations and exports
-
 **TrusteeLoadingJob/TrusteeSaverJob** - Handle trustee-related data processing
 
 ## Development Commands
@@ -94,10 +90,9 @@ end
 ## Key Patterns
 
 ### Data Flow
-1. `LoadingJob` fetches exchange rates from Gera
-2. Data is processed in batches and stored in Redis via `Repository`
-3. `Service` retrieves data, calculates commissions, and determines competitiveness
-4. Results are serialized and made available for API consumption
+1. Data is processed and stored in Redis via `Repository`
+2. `Service` retrieves data, calculates commissions, and determines competitiveness
+3. Results are serialized and made available for API consumption
 
 ### Key Calculations
 - Commission calculation: `calculate_comission(row.rate, base_rate_multiplicator)`
