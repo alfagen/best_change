@@ -4,7 +4,7 @@ module BestChange
   class LoadingJob < ApplicationJob
     include ::AutoLogger
 
-    queue_as :critical
+    queue_as :best_change
     limits_concurrency to: 1, key: ->(*) { 'best_change_loading' }, duration: 5.minutes
 
     def perform
