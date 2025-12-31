@@ -6,7 +6,6 @@ module BestChange
     attr_accessor :valuta_access_log
     attr_accessor :logger
     attr_accessor :rates_export_job_class
-    attr_accessor :fetcher_path
 
     def rates_export_job
       return nil unless rates_export_job_class

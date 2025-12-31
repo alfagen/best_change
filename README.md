@@ -77,7 +77,6 @@ Optional:
 * `REDIS_PORT` - Redis port (default: 6379)
 * `REDIS_DB` - Redis database number (default: 0)
 * `REDIS_PASSWORD` - Redis password if required
-* `BESTCHANGE_FETCHER_PATH` - Path to BestChange fetcher executable
 * `BESTCHANGE_ACCESS_LOG` - Path to access log file
 
 ### Configuration Options
@@ -86,7 +85,6 @@ Optional:
 BestChange.configure do |config|
   config.redis = Redis.new(...)           # Redis connection (required)
   config.exchanger_id = 123               # Your exchanger ID (required)
-  config.fetcher_path = '~/fetcher/main'  # Path to fetcher (optional)
   config.valuta_access_log = 'log.txt'    # Access log path (optional)
   config.auto_start_jobs = true            # Enable background jobs (default: true)
   config.api_enabled = true               # Enable API endpoints (default: true)
@@ -263,11 +261,6 @@ $ bin/console
 2. **Exchanger ID Not Set**
    ```bash
    export BESTCHANGE_EXCHANGER_ID=123
-   ```
-
-3. **Fetcher Not Found**
-   ```bash
-   export BESTCHANGE_FETCHER_PATH=/path/to/fetcher/main
    ```
 
 ### Debug Mode

@@ -102,7 +102,6 @@ rails generate best_change:job MyJob
 - `logger` - Logger instance (defaults to Rails.logger)
 - `auto_start_jobs` - Enable background jobs (default: true)
 - `api_enabled` - Enable API endpoints (default: true)
-- `fetcher_path` - Path to fetcher executable
 - `valuta_access_log` - Access log file path
 
 ### Environment Variables
@@ -116,7 +115,6 @@ REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_DB=0
 REDIS_PASSWORD=secret
-BESTCHANGE_FETCHER_PATH=~/fetcher/main
 BESTCHANGE_ACCESS_LOG=/var/log/best_change.log
 ```
 
