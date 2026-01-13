@@ -109,9 +109,13 @@ RSpec.configure do |config|
   # Include engine specific helpers
   config.include BestChange::Engine.routes.url_helpers if defined?(BestChange::Engine)
 
-  # Setup for Sidekiq testing
+  # Setup for ActiveJob testing
+  config.include ActiveJob::TestHelper, type: :job
+
   config.before(:each) do
-    Sidekiq::Worker.clear_all
+    # Clear enqueued jobs between tests
+    ActiveJob::Base.queue_adapter.enqueued_jobs.clear if ActiveJob::Base.queue_adapter.respond_to?(:enqueued_jobs)
+    ActiveJob::Base.queue_adapter.performed_jobs.clear if ActiveJob::Base.queue_adapter.respond_to?(:performed_jobs)
   end
 
   # Clean up Redis before each test

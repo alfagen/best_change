@@ -9,7 +9,6 @@ require "best_change/version"
 require "best_change/redis_repository"
 require "best_change/last_pull"
 require "best_change/last_pull_serializer"
-require "best_change/loading_worker"
 require "best_change/position_service"
 require "best_change/record"
 require "best_change/repository"
@@ -20,8 +19,8 @@ require "best_change/status_entity"
 require "best_change/status"
 require "best_change/status_serializer"
 require "best_change/configuration"
-require "best_change/trustee_loading_worker"
-require "best_change/trustee_saver_worker"
+
+# Jobs are auto-loaded by the Rails engine in app/jobs/best_change/
 
 module BestChange
   class << self

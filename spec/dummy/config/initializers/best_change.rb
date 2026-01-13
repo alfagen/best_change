@@ -18,16 +18,6 @@ Rails.application.configure do
     config.valuta_access_log = ENV['BESTCHANGE_ACCESS_LOG'] if ENV['BESTCHANGE_ACCESS_LOG']
   end
 
-  # Setup Sidekiq if available
-  if defined?(Sidekiq)
-    redis_url = "redis://#{ENV.fetch('REDIS_HOST', 'localhost')}:#{ENV.fetch('REDIS_PORT', 6379)}/#{ENV.fetch('REDIS_DB', 0)}"
-
-    Sidekiq.configure_server do |sidekiq_config|
-      sidekiq_config.redis = { url: redis_url }
-    end
-
-    Sidekiq.configure_client do |sidekiq_config|
-      sidekiq_config.redis = { url: redis_url }
-    end
-  end
+  # Configure ActiveJob queue adapter
+  config.active_job.queue_adapter = :async
 end

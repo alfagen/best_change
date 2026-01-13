@@ -5,23 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.0] - 2025-12-03
 
 ### Added
 - Full Rails Engine integration with isolate_namespace
 - RESTful API endpoints for exchange rate data
-- Background job processing with Sidekiq
+- Background job processing with ActiveJob
 - Rails-compatible configuration with initializers
 - Middleware for configuration validation
 - Rake tasks for managing background jobs
-- Generators for installation and custom workers
+- Generators for installation and custom jobs
 - Comprehensive documentation and usage examples
-- Support for multiple Rails versions (6.0+)
+- Support for multiple Rails versions (6.1+)
 - Support for multiple Ruby versions (2.7+)
 
 ### Changed
+- Migrated from Sidekiq to ActiveJob for background processing
 - Enhanced configuration class with validation
-- Improved error handling in background workers
+- Improved error handling in background jobs
 - Better logging integration with Rails logger
 - Optimized Redis connection handling
 
@@ -36,5 +37,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Commission calculation relative to base rates
 - Competitive status determination
 - Redis-based data storage
-- Background processing with Sidekiq
+- Background processing with ActiveJob
 - Basic service layer implementation

@@ -32,16 +32,9 @@ BestChange is a Ruby gem that provides an adapter and utilities to work with dat
 - `Status` - Status of an exchange rate (actual/await)
 - `Configuration` - Redis connection and exchanger ID settings
 
-### Background Workers (Sidekiq)
+### Background Jobs (ActiveJob)
 
-**LoadingWorker (`lib/best_change/loading_worker.rb`)**
-- Main background job that processes all available exchange rates
-- Fetches rates from `Gera::ExchangeRate.available_for_parser`
-- Batch processes rates in chunks of 499
-- Triggers rate calculations and exports
-
-**BatchLoadingWorker** - Processes batches of exchange rate data
-**TrusteeLoadingWorker/TrusteeSaverWorker** - Handle trustee-related data processing
+**TrusteeLoadingJob/TrusteeSaverJob** - Handle trustee-related data processing
 
 ## Development Commands
 
@@ -75,7 +68,7 @@ yard  # Generate documentation
 
 The project uses several key dependencies:
 - **Redis** - Data storage and caching
-- **Sidekiq** - Background job processing
+- **ActiveJob** - Background job processing (Rails built-in)
 - **Gera** - External gem for currency exchange logic (GitHub dependency)
 - **Virtus** - Attributes and models
 - **Oj** - Fast JSON parsing
@@ -97,10 +90,9 @@ end
 ## Key Patterns
 
 ### Data Flow
-1. `LoadingWorker` fetches exchange rates from Gera
-2. Data is processed in batches and stored in Redis via `Repository`
-3. `Service` retrieves data, calculates commissions, and determines competitiveness
-4. Results are serialized and made available for API consumption
+1. Data is processed and stored in Redis via `Repository`
+2. `Service` retrieves data, calculates commissions, and determines competitiveness
+3. Results are serialized and made available for API consumption
 
 ### Key Calculations
 - Commission calculation: `calculate_comission(row.rate, base_rate_multiplicator)`

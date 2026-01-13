@@ -14,9 +14,9 @@ GIT
 
 GIT
   remote: https://github.com/alfagen/gera
-  revision: 5229098c1b9a79381e309c50f46d89572a502a7b
+  revision: 592c551da29c1a65b23f1dfa92a03e31043b28bf
   specs:
-    gera (0.3.3)
+    gera (0.4.0)
       active_link_to
       alias_association
       authority
@@ -43,7 +43,7 @@ GIT
 PATH
   remote: .
   specs:
-    best_change (0.3.0)
+    best_change (1.1.1)
       activesupport
       auto_logger
       fast_jsonapi
@@ -59,7 +59,6 @@ PATH
       redis (~> 4.0)
       redis-namespace
       rubyzip (>= 1.0.0)
-      sidekiq
       sqlite3
       virtus
       zip-zip
@@ -145,8 +144,8 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
-    addressable (2.8.7)
-      public_suffix (>= 2.0.2, < 7.0)
+    addressable (2.8.8)
+      public_suffix (>= 2.0.2, < 8.0)
     alias_association (1.0.0)
       activerecord (>= 6.0)
       activesupport (>= 6.0)
@@ -198,7 +197,7 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     diff-lcs (1.6.2)
     domain_name (0.6.20240107)
-    draper (4.0.4)
+    draper (4.0.6)
       actionpack (>= 5.0)
       activemodel (>= 5.0)
       activemodel-serializers-xml (>= 1.0)
@@ -394,7 +393,7 @@ GEM
     pry-rails (0.3.11)
       pry (>= 0.13.0)
     psych (3.1.0)
-    public_suffix (6.0.2)
+    public_suffix (7.0.0)
     racc (1.8.1)
     rack (3.2.4)
     rack-session (2.1.1)
@@ -501,7 +500,7 @@ GEM
     rubyzip (3.2.0)
     securerandom (0.4.1)
     shellany (0.0.1)
-    sidekiq (8.0.9)
+    sidekiq (8.0.10)
       connection_pool (>= 2.5.0)
       json (>= 2.9.0)
       logger (>= 1.6.2)

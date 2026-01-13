@@ -51,7 +51,7 @@ Gem::Specification.new do |spec|
     spec.add_dependency 'grape'
     spec.add_dependency 'grape-entity'
 
-    spec.add_dependency 'sidekiq'
+    # ActiveJob is provided by Rails, no need for separate dependency
 
     # In spec.add_dependency hell migrating to RubyZip v1.0.0? Include zip-zip in your Gemfile and everything's coming up roses!
     # для axlsx

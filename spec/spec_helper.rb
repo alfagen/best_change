@@ -12,8 +12,9 @@ require 'grape'
 require 'grape-entity'
 require 'auto_logger'
 require 'fast_jsonapi'
-require 'sidekiq'
-require 'sidekiq/testing'
+# ActiveJob for background job testing
+require 'active_job'
+require 'active_job/test_helper'
 require 'factory_bot'
 require 'redis'
 require 'redis/namespace'
@@ -37,12 +38,30 @@ BTC = Money::Currency.find('BTC')
 # Load BestChange after dependencies
 require "best_change"
 
+# Configure ActiveJob for testing
+ActiveJob::Base.queue_adapter = :test
+ActiveJob::Base.logger = Logger.new(nil)
+
+# Stub SolidQueue-specific methods that aren't available in plain ActiveJob
+module ActiveJob
+  class Base
+    def self.limits_concurrency(**_options)
+      # No-op in tests - this is a SolidQueue-specific feature
+    end
+  end
+end
+
+# Load jobs manually (since Rails engine initializers don't run in tests)
+Dir[File.join(File.dirname(__FILE__), '../app/jobs/best_change/*.rb')].sort.each do |file|
+  require file
+end
+
 # Load our factories only (avoid duplication with gem factories)
 FactoryBot.definition_file_paths = [File.join(__dir__, 'factories')]
 FactoryBot.find_definitions
 
-# Stub worker for testing
-class StubRatesExportWorker
+# Stub job for testing
+class StubRatesExportJob
   def perform; end
 end
 
@@ -51,7 +70,7 @@ BestChange.configure do |config|
   config.redis = Redis.new(db: 1, host: ENV['REDIS_HOST'] || 'localhost')
   config.exchanger_id = 522
   config.valuta_access_log = Rails.root.join('tmp', 'valuta_access.log').to_s if defined?(Rails)
-  config.rates_export_worker_class = StubRatesExportWorker
+  config.rates_export_job_class = StubRatesExportJob
 end
 
 require 'vcr'
@@ -65,6 +84,9 @@ VCR.configure do |c|
 end
 
 RSpec.configure do |config|
+  # Create log directory for AutoLogger
+  FileUtils.mkdir_p('log')
+
   config.include FactoryBot::Syntax::Methods
 
   # Enable flags like --only-failures and --next-failure
@@ -88,14 +110,8 @@ RSpec.configure do |config|
     end
   end
 
-  # Setup for Sidekiq testing
-  config.before(:each) do
-    Sidekiq::Testing.inline!
-    # Sidekiq 8+ doesn't have clear_all, use alternative approach
-    if defined?(Sidekiq::Queue)
-      Sidekiq::Queue.all.each(&:clear)
-    end
-  end
+  # Setup for ActiveJob testing
+  config.include ActiveJob::TestHelper, type: :job
 
   # Mock Time.zone for tests
   config.before(:each) do

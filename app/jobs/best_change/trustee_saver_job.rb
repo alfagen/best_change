@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 module BestChange
-  class TrusteeSaverWorker
-    include ::Sidekiq::Worker
-
-    sidekiq_options queue: :default, retry: 3
+  class TrusteeSaverJob < ApplicationJob
+    queue_as :default
+    retry_on StandardError, wait: :polynomially_longer, attempts: 3
 
     BASE_URL = 'https://api.v3.trustee.deals/data/all'
     TOKEN_NETWORK_TO_CURRENCY = {
